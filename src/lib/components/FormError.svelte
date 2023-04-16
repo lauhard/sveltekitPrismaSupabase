@@ -1,0 +1,22 @@
+<script lang="ts">
+    import type { ActionData } from "../../routes/bookmarks/$types";
+    export let form: ActionData = null
+    export let field: string = ""
+    export let error: string = ""
+</script>
+{#if form?.error[field]?._errors.length > 0}
+    <small>{form?.error[field]?._errors}</small>
+{/if}
+
+{#if error.length > 0}
+    <small>{error}</small>
+{/if}
+ 
+<style lang="scss">
+    small{
+        padding:5px 10px;
+        background: #ff324f;
+        border-radius: 5px;
+        color:#ebebeb;
+    }
+</style>
