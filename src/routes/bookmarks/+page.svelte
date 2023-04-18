@@ -14,15 +14,16 @@
     console.log("bookmarks", bookmarks);
 
     let showActions = false;
+    let dialog:HTMLDialogElement;
 
-    // const addBookmark = async (event: CustomEvent) => {
-    //     const { result } = event.detail;
-    //     console.log("bookmark added: ", result);
-    //     const { success } = result.data;
-    // };
+    const addBookmark = async (event: CustomEvent) => {
+        const { result } = event.detail;
+        console.log("bookmark added: ", result);
+        const { success } = result.data;
+    };
     // let tableData:any = [];
-
     onMount(async () => {
+        // dialog.close();
         // let {data, error} = await supabase
         //     .from('bookmarks')
         //     .select();
@@ -35,26 +36,67 @@
 
 <h1>Bookmarks</h1>
 <List dataSet={bookmarks} />
-<!-- {#if bookmarks}
-  <ul>
-    {#each bookmarks as bm}
-      <li>
-        <a href="{bm.url}">{bm.name}</a>
-    </li>
-    {/each}
-  </ul>
-{:else}
-  <p>Loading data...</p>
-{/if} -->
-
+<dialog bind:this={dialog}>
+    <article>
+      <header>
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <a aria-label="Close" class="close" on:click={()=>dialog.close()}></a>
+        Modal title
+      </header>
+        <Form on:formaction={addBookmark} action="add">
+            <div class="block">
+                <label for="url">
+                    Url
+                    <input
+                        type="text"
+                        id="url"
+                        name="url"
+                        placeholder="Url"
+                        required
+                        on:input={validate}
+                    />
+                    <FormError {form} field="url" />
+                </label>
+                <label for="name">
+                    Name
+                    <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        placeholder="Name"
+                        required
+                        on:input={validate}
+                    />
+                    <FormError {form} field="name" />
+                </label>
+                <label for="name">
+                    Description
+                    <input
+                        type="text"
+                        id="description"
+                        name="description"
+                        placeholder="Description"
+                        required
+                        on:input={validate}
+                    />
+                    <FormError {form} field="description" />
+                </label>
+            </div>
+            <button type="submit">Submit</button>
+        </Form>
+    </article>
+</dialog>
 
 <div class="wrapper">
     <div class="actions"
         on:mouseenter={(e) => (showActions = true)}
-        class:xxx={showActions === true}
+        class:showActions={showActions === true}
     >
-        <a href="/bookmarks/create"><i class="fa-solid fa-circle-plus" /></a>
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <!-- svelte-ignore a11y-missing-attribute -->
+        <a on:click={()=>{dialog.show(); showActions=false}}><i class="fa-solid fa-circle-plus" /></a>
     </div>
+    <!-- svelte-ignore a11y-mouse-events-have-key-events -->
     <i
         on:mouseenter={(e) => (showActions = true)}
         on:mouseout={(e) => (showActions = false)}
@@ -78,22 +120,18 @@
             justify-content: center;
             i {
                 font-size: 0px;
-                
             }
             transition: all 0.3s ease-in-out;
         }
-        .xxx {
+        .showActions {
             min-height: 50px;
             opacity: 1;
-
             i {
                 font-size: 50px;
                 margin: -5px;
-
             }
             transition: all 0.3s ease-in-out;
         }
-
         .fa-pen {
             background-color: #057bca;
             width: 50px;
