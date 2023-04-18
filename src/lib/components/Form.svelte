@@ -1,12 +1,17 @@
 <script lang="ts">
-	import {  enhance } from '$app/forms';
+	import { enhance } from '$app/forms';
     import { formAction } from '$lib/forms/enhance';
     import { createEventDispatcher } from 'svelte';
     export let action="";
     const dispatch = createEventDispatcher();
+
+
+    
+
+
 </script>
 <div class="form-wrapper">
-        <form method="POST" use:enhance={(e)=>formAction(e, dispatch)} action="?/{action}">
+    <form method="POST" use:enhance={(e)=>formAction(e, dispatch)} action="?/{action}">
         <slot></slot>
     </form>
 </div>

@@ -11,13 +11,10 @@ export const formAction = ({form, data, action, cancel, submitter }: any, callba
         if(isValid==="success" ) {
             if(result?.data?.success) {
                 form.reset();
-                await invalidateAll() // run all load functions
-
+                await invalidateAll(); // run all load functions
             }
             // console.log("result.data",result.data)
             await applyAction(result) // pass form data
-            // await applyAction(result)
-            
         }
         if(typeof(callback) == "function")
             callback("formaction", {"result": result})
