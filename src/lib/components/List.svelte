@@ -17,6 +17,7 @@
 <style lang="scss">
     .list{
         width: 80%;
+        max-width: 800px;
         margin: 0 auto;
         ul{
 

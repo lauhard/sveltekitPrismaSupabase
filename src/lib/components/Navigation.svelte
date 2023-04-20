@@ -6,9 +6,10 @@
         <li><strong>Supabase Demo</strong></li>
     </ul>
     <ul>
-        <li><a href="/">Home</a></li>
-        <li><a href="/bookmarks">Bookmarks</a></li>
+        <li><a href="/">Bookmarks</a></li>
+        <li><a href="/categories">Categories</a></li>
     </ul>
+   
   </nav>
 <style lang="scss">
     nav{

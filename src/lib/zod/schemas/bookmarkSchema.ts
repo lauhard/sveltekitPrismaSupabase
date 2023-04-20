@@ -8,5 +8,5 @@ export const bookmarkSchema = z.object({
     }),
     description: z.string({
         required_error: "Description is required",
-    }).min(5, {message: "Minimum 5 Characters..."}).startsWith("abc", {message:"false"})
+    }).min(3, {message: "Minimum 5 Characters..."})
 })

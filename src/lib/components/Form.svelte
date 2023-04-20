@@ -4,11 +4,6 @@
     import { createEventDispatcher } from 'svelte';
     export let action="";
     const dispatch = createEventDispatcher();
-
-
-    
-
-
 </script>
 <div class="form-wrapper">
     <form method="POST" use:enhance={(e)=>formAction(e, dispatch)} action="?/{action}">

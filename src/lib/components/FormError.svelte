@@ -1,5 +1,6 @@
 <script lang="ts">
-    import type { ActionData } from "../../routes/bookmarks/$types";
+    import type { ActionData } from "../../routes/$types";
+
     export let form: ActionData = null
     export let field: string = ""
     export let error: string = ""
@@ -18,5 +19,9 @@
         background: #ff324f;
         border-radius: 5px;
         color:#ebebeb;
+        width:100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 </style>

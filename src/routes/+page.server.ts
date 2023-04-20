@@ -1,7 +1,7 @@
-import type { Actions } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";
 import { bookmarkSchema } from "$lib/zod/schemas/bookmarkSchema";
-import { PrismaClient, type bookmark } from '@prisma/client';
+import { Prisma, PrismaClient, type bookmark } from '@prisma/client';
+import type { Actions } from "@sveltejs/kit";
 
 export const load: PageServerLoad = async (event) => {
     // console.log("PageServerLoad",event)
@@ -9,7 +9,7 @@ export const load: PageServerLoad = async (event) => {
 
     const client = new PrismaClient();
     const bookmarks:Array<bookmark> = await client.bookmark.findMany();
-    console.log("bookmarks", bookmarks)
+    console.log("bookmarks-", bookmarks)
     return {
         bookmarks
     }
@@ -24,14 +24,32 @@ export const actions: Actions = {
         const validationResponse = bookmarkSchema.safeParse(formdata);
         const response={
             success:false,
-            error:{}
+            error:{},
+            prismaError:""
         }
         if (!validationResponse.success) {
             const zodError = validationResponse.error.format();
             // console.log("zodError", zodError)
             response.error = zodError;
         } else {
-            response.success = true;
+            const client = new PrismaClient();
+            try {
+                await client.bookmark.create({
+                    data:{
+                        url:formdata.url.toString(),
+                        name:formdata.name.toString(),
+                        description:formdata.description.toString()
+                    }
+        
+                })
+                response.success = true;
+            } catch (error) {
+                if (error instanceof Prisma.PrismaClientKnownRequestError) {
+                    console.log("error.code", error.message.split('invocation:')[1])
+                    response.prismaError = error.message.split('invocation:')[1];
+                }
+                response.success = false;
+            }
         }
         return response
     }
