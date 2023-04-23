@@ -1,28 +1,38 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-    import type { Bookmark } from "$lib/types/bookmark";
+	import { createEventDispatcher, onMount } from 'svelte';
+    import Form from './Form.svelte';
+    import type { bookmark } from '@prisma/client';
 
-    export let data: Bookmark;
-    $:flip=false;
-    $:ready=false;
-    $:console.log("flip",flip)
+    export let bookmark: bookmark;
+    $:flipDescription=false;    //reactive prop to show/hide description
+    $:pageReady=false;          //reactive prop which turns true if component is mounted
 
-    onMount(()=>{
-        ready=true;
+    const dispatch = createEventDispatcher();
+
+    onMount(async ()=>{
+        //wait until component is ready and mounted in the DOM
+        pageReady=true;
     })
-    
 </script>
-    {#if ready}
+    {#if pageReady}
         <div class="card">
             <div class="header">
-                <a href={data.url}>
+                <a href={bookmark.url}>
                     <i class="fa-solid fa-link" />
                     <div class="menu">
-                        <a href="#"> <i class="fa-solid fa-pen" /></a>
-                        <a href="#"> <i class="fa-solid fa-remove" /></a> 
+                        <Form --form-width="auto" --direction="row" --display="flex" 
+                            on:formaction={(e)=>dispatch("formactionResult", {"result": e.detail.result})}>
+                            <input type="hidden" name="id" value={bookmark.id} />
+                            <button class="form-button edit"  on:click|preventDefault={(e)=>{dispatch("edit", {"bookmark": bookmark})}}>
+                                <i class="fa-solid fa-edit" />
+                            </button>
+                            <button class="form-button delete" formaction="?/del" type="submit">
+                                <i class="fa-solid fa-remove" />
+                            </button> 
+                        </Form>
                     </div>
-                    <span class="url">{data.url}</span>
-                    <h3 class="name">{data.name}</h3>
+                    <span class="url">{bookmark.url}</span>
+                    <h3 class="name">{bookmark.name}</h3>
                 </a>
                 <div class="tags">
                     <ul>
@@ -31,14 +41,18 @@
                         <li><a href="#">movies</a></li>
                     </ul>
                 </div>
-                {#if data.description}
-                    <a on:click={(e)=>flip=!flip}><i class="fa-solid fa-circle-chevron-down" class:flip="{flip === true}" /></a> 
+                {#if bookmark.description}
+                    <!-- svelte-ignore a11y-click-events-have-key-events -->
+                    <!-- svelte-ignore a11y-missing-attribute -->
+                    <a on:click={(e)=>flipDescription=!flipDescription}>
+                        <i class="fa-solid fa-circle-chevron-down" class:flip="{flipDescription === true}" />
+                    </a> 
                 {/if}
             </div>
-        {#if flip}
+        {#if flipDescription}
             <div class="body">
                 <p>
-                    {data.description}
+                    {bookmark.description}
                 </p>
             </div>
         {/if}
@@ -117,7 +131,7 @@
                         right:5px;
                         z-index: 10;
                         box-sizing: border-box;
-                        i ,a{
+                        i , .form-button{
                             width:33px;
                             height:33px;
                             display: flex;
@@ -127,25 +141,29 @@
                             padding: 0;
                             box-sizing: border-box;
                         }
+                        .form-button:hover, .form-button{
+                            border-style: none;
+                            outline-style: none;
+                            background-color: transparent;
+                        }
                         a{
                             margin-left: 5px;
                         }
-                        .fa-remove, .fa-pen{
+                        .fa-remove, .fa-edit{
                             color:var(--primary-inverse);
-                            font-size: 14px;
                             min-width: 1.3rem;
                             min-height: 1.3rem;
                             box-sizing: border-box;
                         }
-                        .fa-pen{
-                            font-size: 10px;
+                        .fa-edit{
+                            font-size: 14px;
                             box-sizing: border-box;
                         }
-                        .fa-remove:hover, .fa-pen:hover{
+                        .fa-remove:hover, .fa-edit:hover{
                             color: var(--del-color);
                             box-sizing: border-box;
                         }
-                        .fa-pen:hover{
+                        .fa-edit:hover{
                             color: var(--primary)
                         }
                     }

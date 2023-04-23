@@ -5,11 +5,11 @@
     export let field: string = ""
     export let error: string = ""
 </script>
-{#if form?.error[field]?._errors.length > 0}
-    <small>{form?.error[field]?._errors}</small>
+{#if form?.zodError[field]?._errors.length > 0}
+    <small>{form?.zodError[field]?._errors}</small>
 {/if}
 
-{#if error.length > 0}
+{#if error && error.length > 0}
     <small>{error}</small>
 {/if}
  

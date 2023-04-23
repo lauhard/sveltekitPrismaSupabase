@@ -1,56 +1,70 @@
 import type { PageServerLoad } from "./$types";
-import { bookmarkSchema } from "$lib/zod/schemas/bookmarkSchema";
-import { Prisma, PrismaClient, type bookmark } from '@prisma/client';
+import { createBookmarks, deleteBookmark, getBookmarks } from "$lib/server/prisma/bookmarks/api";
+import type { bookmark } from "@prisma/client";
+import { validateFormData } from "$lib/zod/helper/forms";
 import type { Actions } from "@sveltejs/kit";
 
 export const load: PageServerLoad = async (event) => {
-    // console.log("PageServerLoad",event)
     console.log("loading bookmarks with prisma client...")
-
-    const client = new PrismaClient();
-    const bookmarks:Array<bookmark> = await client.bookmark.findMany();
-    console.log("bookmarks-", bookmarks)
+    const response = await getBookmarks();
+    const bookmarks = response.data as Array<bookmark>
     return {
         bookmarks
     }
-    
 }
 
 export const actions: Actions = {
     add: async ({request}):Promise<any> => {
-        console.log("hit action")
-       
+        console.log("hit action add:")
         const formdata =  Object.fromEntries(( await request.formData()))
-        const validationResponse = bookmarkSchema.safeParse(formdata);
+        const validationResponse = validateFormData(formdata);
         const response={
             success:false,
-            error:{},
+            zodError:{},
             prismaError:""
         }
-        if (!validationResponse.success) {
-            const zodError = validationResponse.error.format();
-            // console.log("zodError", zodError)
-            response.error = zodError;
-        } else {
-            const client = new PrismaClient();
-            try {
-                await client.bookmark.create({
-                    data:{
-                        url:formdata.url.toString(),
-                        name:formdata.name.toString(),
-                        description:formdata.description.toString()
-                    }
-        
-                })
-                response.success = true;
-            } catch (error) {
-                if (error instanceof Prisma.PrismaClientKnownRequestError) {
-                    console.log("error.code", error.message.split('invocation:')[1])
-                    response.prismaError = error.message.split('invocation:')[1];
-                }
-                response.success = false;
-            }
+        if (!validationResponse.success) response.zodError = validationResponse.error;
+        else {
+            const {success, prismaError} = 
+            await createBookmarks({
+                url: formdata.url.toString(),
+                name: formdata.name.toString(),
+                description: formdata.description.toString(),
+            })
+            if(!success) response.prismaError = prismaError;
+            else response.success = true;
         }
+        return response
+    },
+    del: async ({request}):Promise<any> => {
+        const formData = await request.formData();
+        const id = formData.get("id")?.toString() || "0";
+        console.log("bookmark deleted: id ", id)
+        const response={
+            success:false,
+            zodError:{},
+            prismaError:"",
+            data:0
+        } 
+        const { success, prismaError, data } = await deleteBookmark(id);
+        response.data = data as number;
+        if(!success) response.prismaError = prismaError;
+        else response.success = true;
+        return response
+    },
+    update: async ({request}):Promise<any> => {
+        const formData = await request.formData();
+        const id = formData.get("id")?.toString() || "0";
+        console.log("test ", id)
+        const response={
+            success:false,
+            zodError:{},
+            prismaError:"",
+            data:"test"+id
+        } 
+   
+       
+        response.success = true;
         return response
     }
 };

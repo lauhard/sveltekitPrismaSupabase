@@ -1,26 +1,24 @@
 <script lang="ts">
     import { createEventDispatcher } from "svelte";
-
     let showActions = false;
     const dispatch = createEventDispatcher();
+    export let actions:any=[];
 
-    export let actions:any=[]
 </script>
 <div class="wrapper">
     <!-- svelte-ignore a11y-mouse-events-have-key-events -->
     <div class="actions"
-        
         on:mouseenter={(e) => (showActions = true)}
         on:mouseout={(e) => (showActions = false)}
-
         class:showActions={showActions === true}
     >
         {#each actions as action}
             <!-- svelte-ignore a11y-missing-attribute -->
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <!-- svelte-ignore a11y-mouse-events-have-key-events -->
-            <a  on:click={(e)=>{dispatch("actionclick",{"name":action.name}), showActions=false}}><i class="{action.icon}" style="{action.style}" on:mouseenter={(e) => (showActions = true)}  /></a>
-
+            <a  on:click={(e)=>{dispatch("actionclick", {"name":action.name}), showActions=false}}>
+                <i class="{action.icon}" style="{action.style}" on:mouseenter={(e) => (showActions = true)}  />
+            </a>
         {/each}
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <!-- svelte-ignore a11y-missing-attribute -->
@@ -39,8 +37,10 @@
         height: auto;
         width: 50px;
         position: fixed;
-        right: 20px;
-        bottom: 20px;
+        right: var(--right, 20px);
+        left: var(--left, auto);
+        bottom: var(--bottom, 20px);
+        top: var(--top, auto);
         z-index: 100;
         .actions {
             width: 100%;
